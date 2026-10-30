@@ -118,6 +118,7 @@ header .brand { display: grid; gap: 2px; min-width: 0; }
 .board .tank { position: relative; height: 30px; border-radius: 9px; background: var(--board-track); display: flex; gap: 3px; padding: 3px; overflow: hidden; }
 .board .tank .seg-f { height: 100%; border-radius: 6px; background: var(--fuel); min-width: 4px; transition: flex-basis .45s cubic-bezier(.2,.8,.2,1); }
 .board .tank .seg-f:nth-child(even) { background: var(--fuel-2); }
+.board .tank .seg-f.over { background: var(--over); }
 .board .tank .seg-f.over { background: repeating-linear-gradient(135deg, var(--over) 0 6px, color-mix(in srgb, var(--over) 70%, #000) 6px 12px); }
 .board .tank .mark { position: absolute; top: -2px; bottom: -2px; width: 3px; background: var(--board-ink); border-radius: 2px; }
 .board .legend { display: flex; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap; font-size: 0.86rem; color: var(--board-muted); }
@@ -291,7 +292,7 @@ dialog.sheet { overflow: visible; border: 0; padding: 0; margin: auto auto 0; wi
 dialog.sheet::backdrop { background: rgb(10 12 15 / .45); }
 dialog.sheet[open] { animation: up .24s cubic-bezier(.2,.8,.2,1); }
 @keyframes up { from { transform: translateY(40px); opacity: .6; } to { transform: none; opacity: 1; } }
-.sheet .sh { padding: 10px 18px calc(18px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; overflow-y: auto; max-height: 88dvh; }
+.sheet .sh { padding: 10px 18px calc(18px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; overflow-y: auto; max-height: inherit; }
 .sheet .grab { width: 40px; height: 5px; border-radius: 99px; background: var(--line); justify-self: center; }
 .sheet h2 { font-size: 1.7rem; }
 .sheet .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
@@ -350,8 +351,8 @@ form.measure { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); 
 .profile .wide { grid-column: span 3; }
 .targets { display: grid; gap: 7px; background: var(--well); border-radius: 14px; padding: 13px; }
 .targets .row { display: flex; justify-content: space-between; gap: 8px; }
-.targets .row b { font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; text-align: right; }
-.targets .row span { flex-shrink: 0; }
+.targets .row b { font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: break-word; text-align: right; flex: 0 0 auto; max-width: 62%; }
+.targets .row span { flex: 1 1 0; min-width: 0; }
 .targets .row.key b { color: var(--accent); }
 .targets .row.ok b { color: var(--accent); }
 .targets .row.warn b { color: var(--fuel-ink); }
@@ -595,9 +596,9 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     <div class="sec-head"><h2>Food</h2><span class="sec-total" id="foodTotal">0 kcal</span></div>
     <form class="food-add" id="foodForm">
       <label class="field name"><span class="label">What you ate</span><input id="foodName" placeholder="e.g. Chicken rice, extra chicken" autocomplete="off" required></label>
-      <label class="field"><span class="label">kcal</span><input id="foodKcal" type="number" inputmode="numeric" min="0" max="5000" required></label>
-      <label class="field"><span class="label">Protein <em>g</em></span><input id="foodProtein" type="number" inputmode="decimal" min="0" max="300" step="0.1"></label>
-      <label class="field"><span class="label">Fibre <em>g</em></span><input id="foodFibre" type="number" inputmode="decimal" min="0" max="100" step="0.1"></label>
+      <label class="field"><span class="label">kcal</span><input id="foodKcal" type="number" inputmode="decimal" min="0" max="5000" step="any" required></label>
+      <label class="field"><span class="label">Protein <em>g</em></span><input id="foodProtein" type="number" inputmode="decimal" min="0" max="300" step="any"></label>
+      <label class="field"><span class="label">Fibre <em>g</em></span><input id="foodFibre" type="number" inputmode="decimal" min="0" max="100" step="any"></label>
       <button type="submit" class="solid" style="align-self:end">Add</button>
     </form>
     <div class="quick">
@@ -642,7 +643,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     </form>
 
     <form class="run" id="cardioForm" hidden>
-      <label class="field"><span class="label">Distance <em>km</em></span><input id="runKm" type="number" inputmode="decimal" min="0.1" max="100" step="0.01" placeholder="5.0"></label>
+      <label class="field"><span class="label">Distance <em>km</em></span><input id="runKm" type="number" inputmode="decimal" min="0.1" max="100" step="any" placeholder="5.0"></label>
       <label class="field"><span class="label">Type of run</span>
         <select id="runType"><option>Easy</option><option>Long run</option><option>Tempo</option><option>Intervals</option><option>Race</option></select></label>
       <div class="field span2"><span class="label">Time</span>
@@ -778,12 +779,12 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     <div class="sec-head"><h2>Body</h2><span class="note" id="bodyDay">measurements for today</span></div>
     <div class="tiles" id="latest" style="grid-template-columns:repeat(3,minmax(0,1fr))"></div>
     <form class="measure" id="bodyForm">
-      <label class="field"><span class="label">Weight <em>kg</em></span><input id="mWeight" type="number" inputmode="decimal" step="0.1" min="20" max="300"></label>
-      <label class="field"><span class="label">Waist <em>cm</em></span><input id="mWaist" type="number" inputmode="decimal" step="0.5" min="30" max="250"></label>
-      <label class="field"><span class="label">Body fat <em>%</em></span><input id="mFat" type="number" inputmode="decimal" step="0.1" min="2" max="70"></label>
-      <label class="field"><span class="label">Chest <em>cm</em></span><input id="mChest" type="number" inputmode="decimal" step="0.5" min="40" max="250"></label>
-      <label class="field"><span class="label">Hips <em>cm</em></span><input id="mHips" type="number" inputmode="decimal" step="0.5" min="40" max="250"></label>
-      <label class="field"><span class="label">Arm <em>cm</em></span><input id="mArm" type="number" inputmode="decimal" step="0.5" min="10" max="80"></label>
+      <label class="field"><span class="label">Weight <em>kg</em></span><input id="mWeight" type="number" inputmode="decimal" step="any" min="20" max="300"></label>
+      <label class="field"><span class="label">Waist <em>cm</em></span><input id="mWaist" type="number" inputmode="decimal" step="any" min="30" max="250"></label>
+      <label class="field"><span class="label">Body fat <em>%</em></span><input id="mFat" type="number" inputmode="decimal" step="any" min="2" max="70"></label>
+      <label class="field"><span class="label">Chest <em>cm</em></span><input id="mChest" type="number" inputmode="decimal" step="any" min="40" max="250"></label>
+      <label class="field"><span class="label">Hips <em>cm</em></span><input id="mHips" type="number" inputmode="decimal" step="any" min="40" max="250"></label>
+      <label class="field"><span class="label">Arm <em>cm</em></span><input id="mArm" type="number" inputmode="decimal" step="any" min="10" max="80"></label>
       <div class="measure-actions">
         <button type="submit" class="solid" id="bodySave">Save measurements</button>
         <button type="button" class="ghost" id="bodyClear">Clear this day</button>
@@ -862,7 +863,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
           <option value="bulk">Bulk (about 0.5 kg a week)</option>
           <option value="custom">My own rate…</option>
         </select></label>
-      <label class="field wide" id="pRateWrap" hidden><span class="label">Weight change per week <em>kg; minus to lose, e.g. −0.4</em></span><input id="pRate" type="number" inputmode="decimal" min="-1.5" max="1" step="0.05"></label>
+      <label class="field wide" id="pRateWrap" hidden><span class="label">Weight change per week <em>kg; minus to lose, e.g. −0.4</em></span><input id="pRate" type="number" inputmode="decimal" min="-1.5" max="1" step="any"></label>
       <label class="field wide"><span class="label">Custom calorie target <em>(leave blank to use the calculated one)</em></span><input id="pCustom" type="number" inputmode="numeric" min="1200" max="6000" step="10"></label>
     </form>
     <div class="targets" id="targets"></div>
@@ -1180,7 +1181,8 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     if (a.top === b.top && a.repsAtTop > b.repsAtTop) return ["up", `+${a.repsAtTop - b.repsAtTop} reps at ${dec(a.top, 2)} kg ${since}`];
     if (a.top === b.top && a.volume > b.volume) return ["up", `+${fmt(a.volume - b.volume)} kg volume ${since}`];
     if (a.top === b.top && a.volume === b.volume) return ["same", `Matched ${since}`];
-    return ["down", `Lighter than ${shortDate(prev.k)}`];
+    if (a.top === b.top) return ["down", cur.sets.length < prev.w.sets.length ? `${prev.w.sets.length - cur.sets.length} fewer set${prev.w.sets.length - cur.sets.length === 1 ? "" : "s"} than ${shortDate(prev.k)}` : `${a.reps - b.reps} reps ${since}`];
+    return ["down", `−${dec(b.top - a.top, 2)} kg top set ${since}`];
   }
   // ---------- personal records ----------
   // a session's PRs compared with every earlier session of the same exercise
@@ -1294,7 +1296,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
 
     const tg = targets();
     const eaten = sum(d.food, "kcal"), burned = sum(d.workouts, "kcal"), net = countedKcal(d);
-    $("sBurnedLabel").textContent = trainAdded() ? "Burned" : "Training";
+    $("sBurnedLabel").textContent = trainAdded() ? "Burned" : "Trained (in target)";
     $("sNetRow").hidden = !trainAdded() || !burned;
     $("sBurnWrap").hidden = !burned;
     const protein = sum(d.food, "protein"), fibre = sum(d.food, "fibre");
@@ -1572,7 +1574,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
           a = el("select"); a.id = `ex-${tid}-${i}-n`; a.setAttribute("aria-label", "Type of run");
           for (const [v, l] of Object.entries(RUN_LABEL)) a.append(Object.assign(el("option", null, l), { value: v }));
           a.value = ex.runType || "Easy";
-          b = el("input"); b.id = `ex-${tid}-${i}-s`; b.type = "number"; b.inputMode = "decimal"; b.min = "0.5"; b.max = "100"; b.step = "0.1"; b.value = ex.km ?? ""; b.placeholder = "5"; b.setAttribute("aria-label", "Target distance in km");
+          b = el("input"); b.id = `ex-${tid}-${i}-s`; b.type = "number"; b.inputMode = "decimal"; b.min = "0.5"; b.max = "100"; b.step = "any"; b.value = ex.km ?? ""; b.placeholder = "5"; b.setAttribute("aria-label", "Target distance in km");
           c = el("input"); c.id = `ex-${tid}-${i}-r`; c.value = ex.pace ?? ""; c.placeholder = "6:00"; c.setAttribute("aria-label", "Target pace per km, optional");
           a.onchange = () => { const it = item(); if (it) { it.runType = a.value; planChanged(false); } };
           b.oninput = () => { const it = item(); if (it) { const v = Number(b.value); it.km = v > 0 ? Math.round(v * 100) / 100 : null; planChanged(false); } };
@@ -2534,7 +2536,8 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     $("pRateWrap").hidden = p.aim !== "custom";
     { const o = $("pFreq").querySelector('option[value="auto"]'); o.textContent = `From my log (${dec(loggedWorkoutsPerWeek(), 1)} a week lately)`; }
     const box = $("targets"); box.replaceChildren();
-    const row = (l, v, key) => { const r = el("div", "row" + (key ? " key" : "")); r.append(el("span", null, l), el("b", null, v)); box.append(r); };
+    // keep a number and its unit together ("2,149 kcal" never splits across lines)
+    const row = (l, v, key) => { const r = el("div", "row" + (key ? " key" : "")); r.append(el("span", null, l), el("b", null, String(v).replace(/(\d) (kcal|g|kg)\b/g, "$1\u00a0$2"))); box.append(r); };
     if (tg.missing.length) box.append(el("p", "note", `Add ${tg.missing.join(", ")} to calculate your targets.`));
     if (tg.bmr) {
       const ac = tg.act, jobName = { "1.2": "mostly sitting", "1.35": "on your feet part of the day", "1.5": "physical job" }[String(p.job || "1.2")] || "daily life";
@@ -2581,6 +2584,11 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
   }
   const closeSheet = () => { if (sheet.close) sheet.close(); else sheet.removeAttribute("open"); };
   sheet.addEventListener("click", e => { if (e.target === sheet) closeSheet(); });
+  // iPhone: the keyboard covers the bottom of the screen without resizing the page, so lift the panel above it
+  if (window.visualViewport) {
+    const lift = () => { const vv = window.visualViewport, gap = Math.max(0, innerHeight - vv.height - vv.offsetTop); sheet.style.marginBottom = sheet.open && gap > 80 ? gap + "px" : ""; sheet.style.maxHeight = sheet.open && gap > 80 ? (vv.height - 12) + "px" : ""; };
+    visualViewport.addEventListener("resize", lift); visualViewport.addEventListener("scroll", lift); sheet.addEventListener("close", lift);
+  }
   const fieldEl = (label, input, unit) => { const l = el("label", "field"); const s = el("span", "label", label); if (unit) s.append(" ", el("em", null, unit)); l.append(s, input); return l; };
   function inputEl(value, o = {}) {
     const i = el("input"); Object.assign(i, o); i.value = value ?? "";
@@ -2604,9 +2612,9 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     openSheet("Edit food", b => {
       const form = el("form"); form.style.cssText = "display:grid;gap:12px";
       const nm = inputEl(f.name, { id: "efName", autocomplete: "off", required: true });
-      const kc = inputEl(f.kcal, { id: "efKcal", type: "number", inputMode: "numeric", min: "0", max: "5000", required: true });
-      const pr = inputEl(f.protein || "", { id: "efProtein", type: "number", min: "0", max: "300", step: "0.1" });
-      const fi = inputEl(f.fibre || "", { id: "efFibre", type: "number", min: "0", max: "100", step: "0.1" });
+      const kc = inputEl(f.kcal, { id: "efKcal", type: "number", inputMode: "decimal", min: "0", max: "5000", step: "any", required: true });
+      const pr = inputEl(f.protein || "", { id: "efProtein", type: "number", min: "0", max: "300", step: "any" });
+      const fi = inputEl(f.fibre || "", { id: "efFibre", type: "number", min: "0", max: "100", step: "any" });
       const g = el("div", "grid3"); g.append(fieldEl("kcal", kc), fieldEl("Protein", pr, "g"), fieldEl("Fibre", fi, "g"));
       form.append(fieldEl("What you ate", nm), g);
       sheetActions(form, { saveStyle: FUEL_BTN, del: { fn: () => removeItem(k, "food", id, f.name) } });
@@ -2632,7 +2640,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
       const addRow = (reps, kg) => {
         const r = el("div", "setrow"), i = rows.children.length + 1;
         const ri = inputEl(reps, { type: "number", inputMode: "numeric", min: "1", max: "100", className: "reps" }); ri.setAttribute("aria-label", `Set ${i} reps`);
-        const ki = inputEl(kg, { type: "number", min: "0", max: "500", step: "0.25", className: "kg" }); ki.setAttribute("aria-label", `Set ${i} weight in kg`);
+        const ki = inputEl(kg, { type: "number", min: "0", max: "500", step: "any", className: "kg" }); ki.setAttribute("aria-label", `Set ${i} weight in kg`);
         const x = el("button", null, "×"); x.type = "button"; x.setAttribute("aria-label", `Remove set ${i}`);
         x.onclick = () => { if (rows.children.length > 1) { r.remove(); [...rows.children].forEach((rr, j) => { rr.querySelector(".n").textContent = j + 1; }); } };
         r.append(el("span", "n", String(i)), ri, ki, x); rows.append(r);
@@ -2661,7 +2669,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     const w = day(k).workouts.find(x => x.id === id); if (!w) return;
     openSheet("Edit run", b => {
       const form = el("form"); form.style.cssText = "display:grid;gap:12px";
-      const km = inputEl(w.km, { id: "erKm", type: "number", min: "0.1", max: "100", step: "0.01" });
+      const km = inputEl(w.km, { id: "erKm", type: "number", min: "0.1", max: "100", step: "any" });
       const ty = el("select"); ty.id = "erType";
       for (const t of Object.keys(RUN_LABEL)) ty.append(Object.assign(el("option", null, t), { value: t }));
       ty.value = w.runType || "Easy";
@@ -2911,7 +2919,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
       it.rows.forEach((r, ri) => {
         const row = el("div", "srow" + (r.done ? " done" : ""));
         const reps = inputEl(r.reps, { type: "number", inputMode: "numeric", min: "1", max: "100", id: `sx${xi}r${ri}` }); reps.setAttribute("aria-label", `${it.name} set ${ri + 1} reps`);
-        const kg = inputEl(r.kg, { type: "number", min: "0", max: "500", step: "0.25", id: `sx${xi}k${ri}` }); kg.setAttribute("aria-label", `${it.name} set ${ri + 1} weight in kg`);
+        const kg = inputEl(r.kg, { type: "number", min: "0", max: "500", step: "any", id: `sx${xi}k${ri}` }); kg.setAttribute("aria-label", `${it.name} set ${ri + 1} weight in kg`);
         const c1 = el("div", "cell"), c2 = el("div", "cell"); c1.append(reps, el("i", null, "reps")); c2.append(kg, el("i", null, "kg"));
         const read = () => { r.reps = reps.value === "" ? "" : Math.round(Number(reps.value)); r.kg = kg.value === "" ? "" : Number(kg.value); };
         reps.oninput = kg.oninput = () => { read(); saveSess(); };
@@ -3202,7 +3210,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     const r = el("div", "setrow");
     const n = el("span", "n", String(i));
     const ri = el("input"); ri.type = "number"; ri.inputMode = "numeric"; ri.min = "1"; ri.max = "100"; ri.value = reps; ri.className = "reps"; ri.setAttribute("aria-label", `Set ${i} reps`); ri.id = `setReps${i}`;
-    const ki = el("input"); ki.type = "number"; ki.inputMode = "decimal"; ki.min = "0"; ki.max = "500"; ki.step = "0.25"; ki.value = kg; ki.className = "kg"; ki.setAttribute("aria-label", `Set ${i} weight in kg`); ki.id = `setKg${i}`;
+    const ki = el("input"); ki.type = "number"; ki.inputMode = "decimal"; ki.min = "0"; ki.max = "500"; ki.step = "any"; ki.value = kg; ki.className = "kg"; ki.setAttribute("aria-label", `Set ${i} weight in kg`); ki.id = `setKg${i}`;
     const x = el("button", null, "×"); x.type = "button"; x.setAttribute("aria-label", `Remove set ${i}`);
     x.onclick = () => { if (box.children.length > 1) { r.remove(); renumber(); } else { ri.value = ""; ki.value = ""; } };
     r.append(n, ri, ki, x); box.append(r);
@@ -3503,7 +3511,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
   };
 
   // ---------- developer info ----------
-  const APP_VERSION = "16", APP_BUILD = "30 Oct 2026";
+  const APP_VERSION = "17", APP_BUILD = "30 Oct 2026";
   const fmtTime = t => t ? new Date(t).toLocaleString("en-MY", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", second: "2-digit" }) : "never";
   const ago = t => { if (!t) return "never"; const s = Math.round((Date.now() - t) / 1000); return s < 60 ? `${s}s ago` : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} days ago`; };
   let devExtra = [];
@@ -3932,8 +3940,25 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
 
   // open the right tab when started from a notification (…/#food, #train, #body)
   const HASH_NAV = { checkin: ["today"], today: ["today"], food: ["food", null, "foodName"], train: ["train"], body: ["progress", "body"], month: ["progress", "month"] };
-  function hashNav() { const h = location.hash.slice(1); if (h === "checkin") { forceCheckin = true; state.current = todayKey(); render(); } if (HASH_NAV[h]) { go(...HASH_NAV[h]); history.replaceState(null, "", location.pathname + location.search); } }
+  function hashNav() {
+    const h = location.hash.slice(1);
+    if (h === "checkin") forceCheckin = true;
+    // reminders are about today: open them on today, even if another day was showing
+    if (HASH_NAV[h] && h !== "month" && state.current !== todayKey()) { state.current = todayKey(); bodyDirty = false; }
+    if (h === "checkin" || HASH_NAV[h]) render();
+    if (HASH_NAV[h]) { go(...HASH_NAV[h]); history.replaceState(null, "", location.pathname + location.search); } }
   addEventListener("hashchange", hashNav);
+  // a phone can keep the app open in the background overnight: when the date changes, move "today" forward
+  // (only if you were on today, so a past day you're editing stays put)
+  let lastToday = todayKey();
+  function rollDay() {
+    const t = todayKey(); if (t === lastToday) return;
+    if (state.current === lastToday) { state.current = t; bodyDirty = false; $("bodySaved").hidden = true; }
+    lastToday = t; render();
+  }
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) rollDay(); });
+  addEventListener("focus", rollDay); addEventListener("pageshow", rollDay);
+  setInterval(rollDay, 60000);
 
   $("versionNote").textContent = `App version ${APP_VERSION} · ${APP_BUILD} · more in Me → Dev`;
   for (const b of document.querySelectorAll('[data-go="me:dev"], .tabbar [data-go="me"]')) b.addEventListener("click", () => setTimeout(renderDev, 0));

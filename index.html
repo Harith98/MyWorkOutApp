@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1f8a5b">
+<meta name="theme-color" content="#ebecee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121315" media="(prefers-color-scheme: dark)">
 <meta name="description" content="Track food, weights, running and body measurements. Works offline; your data stays on your phone.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -20,43 +21,43 @@
    yellow = food (fuel) · red = training · blue = body + protein · green = fibre, done, on track.
    Big Shoulders Display for scoreboard numbers and headings, Figtree for everything else. */
 :root {
-  --bg: #eceef1;
+  --bg: #ebecee;
   --surface: #ffffff;
-  --well: #f4f5f7;
-  --ink: #17191e;
-  --muted: #5d6370;
-  --line: #d8dbe1;
-  --fuel: #f2b705;  --fuel-ink: #7d5800;  --fuel-soft: #fcf0c4;  --fuel-2: #e09a00;
-  --accent: #12814a; --accent-soft: #d6f0e2;
-  --burn: #d42a3a;   --burn-soft: #fbdfe2;
-  --measure: #1d5bc2; --measure-soft: #dde6f8;
-  --fibre: #2f9a58;  --fibre-soft: #ddf1e4;
-  --over: #b8124a;
-  --gold: #8f6300;   --gold-soft: #fbefc6;
+  --well: #f3f4f5;
+  --ink: #1e2024;
+  --muted: #62666f;
+  --line: #dadce0;
+  --fuel: #d4a446;  --fuel-ink: #7a5a16;  --fuel-soft: #f3ead6;  --fuel-2: #bf9038;
+  --accent: #4f7d5c; --accent-soft: #e0eae2;
+  --burn: #b5524a;   --burn-soft: #f2e0dd;
+  --measure: #4f6f96; --measure-soft: #e0e7ef;
+  --fibre: #6f9277;  --fibre-soft: #e3ece5;
+  --over: #9e4058;
+  --gold: #8a6a1f;   --gold-soft: #f2e9d2;
   --on-solid: #ffffff;
-  --board: #17191e;  --board-ink: #f4f5f7; --board-muted: #9aa1ad; --board-track: #2b2f37;
+  --board: #1e2024;  --board-ink: #f2f3f4; --board-muted: #9a9ea7; --board-track: #2e3136;
   --display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
   --body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
   --mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f1114; --surface: #1a1d22; --well: #22262c; --ink: #eef0f3; --muted: #9aa1ad; --line: #2e333b;
-    --fuel: #f5c33b; --fuel-ink: #f5c33b; --fuel-soft: #3a2f10; --fuel-2: #d99a12;
-    --accent: #3cc57f; --accent-soft: #163527; --burn: #ff5d69; --burn-soft: #3d1b1f;
-    --measure: #74a2f2; --measure-soft: #1b2840; --fibre: #5bc383; --fibre-soft: #183324; --over: #ff79a8;
-    --gold: #f5c33b; --gold-soft: #3a2f10; --on-solid: #0f1114;
-    --board: #1a1d22; --board-ink: #eef0f3; --board-muted: #9aa1ad; --board-track: #2e333b;
+    --bg: #121315; --surface: #1c1d20; --well: #24262a; --ink: #eceef0; --muted: #9a9ea7; --line: #303237;
+    --fuel: #d9b05a; --fuel-ink: #dcb45f; --fuel-soft: #3a3120; --fuel-2: #b89040;
+    --accent: #88b394; --accent-soft: #23302a; --burn: #cf7a6f; --burn-soft: #3a2624;
+    --measure: #8aa6c8; --measure-soft: #222b36; --fibre: #8fb398; --fibre-soft: #223026; --over: #d38ea0;
+    --gold: #d9b05a; --gold-soft: #3a3120; --on-solid: #121315;
+    --board: #1c1d20; --board-ink: #eceef0; --board-muted: #9a9ea7; --board-track: #303237;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f1114; --surface: #1a1d22; --well: #22262c; --ink: #eef0f3; --muted: #9aa1ad; --line: #2e333b;
-  --fuel: #f5c33b; --fuel-ink: #f5c33b; --fuel-soft: #3a2f10; --fuel-2: #d99a12;
-  --accent: #3cc57f; --accent-soft: #163527; --burn: #ff5d69; --burn-soft: #3d1b1f;
-  --measure: #74a2f2; --measure-soft: #1b2840; --fibre: #5bc383; --fibre-soft: #183324; --over: #ff79a8;
-  --gold: #f5c33b; --gold-soft: #3a2f10; --on-solid: #0f1114;
-  --board: #1a1d22; --board-ink: #eef0f3; --board-muted: #9aa1ad; --board-track: #2e333b;
+  --bg: #121315; --surface: #1c1d20; --well: #24262a; --ink: #eceef0; --muted: #9a9ea7; --line: #303237;
+  --fuel: #d9b05a; --fuel-ink: #dcb45f; --fuel-soft: #3a3120; --fuel-2: #b89040;
+  --accent: #88b394; --accent-soft: #23302a; --burn: #cf7a6f; --burn-soft: #3a2624;
+  --measure: #8aa6c8; --measure-soft: #222b36; --fibre: #8fb398; --fibre-soft: #223026; --over: #d38ea0;
+  --gold: #d9b05a; --gold-soft: #3a3120; --on-solid: #121315;
+  --board: #1c1d20; --board-ink: #eceef0; --board-muted: #9a9ea7; --board-track: #303237;
   color-scheme: dark;
 }
 
@@ -133,8 +134,8 @@ header .brand { display: grid; gap: 2px; min-width: 0; }
 .bar span { display: block; height: 100%; border-radius: 99px; transition: width .5s ease; }
 .macro.p .bar span { background: var(--measure); }
 .macro.f .bar span { background: var(--fibre); }
-.board .macro.p .bar span { background: #74a2f2; }
-.board .macro.f .bar span { background: #5bc383; }
+.board .macro.p .bar span { background: #8aa6c8; }
+.board .macro.f .bar span { background: #8fb398; }
 .setup-hint { background: var(--fuel-soft); color: var(--ink); border-radius: 14px; padding: 11px 13px; font-size: 0.9rem; }
 .board .setup-hint { background: var(--board-track); color: var(--board-ink); }
 .board .setup-hint .linkish { color: var(--fuel); }
@@ -153,7 +154,7 @@ header .brand { display: grid; gap: 2px; min-width: 0; }
 .food .sec-total { color: var(--fuel-ink); }
 form.food-add { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 8px; }
 form.food-add .name { grid-column: 1 / -1; }
-form.food-add .solid { background: var(--fuel); color: #17191e; }
+form.food-add .solid { background: var(--fuel); color: #1e2024; }
 .quick { display: grid; gap: 10px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .chips > .label { margin-right: 2px; }
@@ -2605,7 +2606,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     r.append(c, s); a.append(r); form.append(a);
     return s;
   }
-  const FUEL_BTN = "background:var(--fuel);color:#17191e";
+  const FUEL_BTN = "background:var(--fuel);color:#1e2024";
 
   function editFood(k, id) {
     const f = day(k).food.find(x => x.id === id); if (!f) return;
@@ -3511,7 +3512,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
   };
 
   // ---------- developer info ----------
-  const APP_VERSION = "17", APP_BUILD = "30 Oct 2026";
+  const APP_VERSION = "18", APP_BUILD = "30 Oct 2026";
   const fmtTime = t => t ? new Date(t).toLocaleString("en-MY", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", second: "2-digit" }) : "never";
   const ago = t => { if (!t) return "never"; const s = Math.round((Date.now() - t) / 1000); return s < 60 ? `${s}s ago` : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} days ago`; };
   let devExtra = [];

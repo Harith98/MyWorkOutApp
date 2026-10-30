@@ -513,6 +513,38 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
 .sum-tiles .tile:nth-child(4) .v { color: var(--gold); }
 .sum-fun { font-weight: 700; font-size: 1rem; }
 @media (max-width: 380px) { .sum-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .streak .sn b { font-size: 2.2rem; } }
+
+/* ---------- v19: muscle map, rest days ---------- */
+.bodymap-card { display: grid; gap: 8px; background: var(--well); border-radius: 18px; padding: 14px 14px 12px; }
+.bodymap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; justify-items: center; }
+.bodymap figure { margin: 0; display: grid; justify-items: center; gap: 2px; width: 100%; }
+.bodymap svg { width: 100%; max-width: 150px; height: auto; display: block; overflow: visible; }
+.bodymap figcaption { font-size: 0.76rem; color: var(--muted); font-weight: 600; }
+.bodymap .sil { fill: color-mix(in srgb, var(--line) 55%, var(--well)); }
+.bodymap .sil .nb-s { fill: none; stroke: color-mix(in srgb, var(--line) 55%, var(--well)); stroke-linecap: round; }
+.bodymap .m { fill: var(--line); stroke: var(--well); stroke-width: 3; cursor: pointer; transition: fill .3s ease, fill-opacity .3s ease; outline: none; }
+.bodymap .sep { fill: none; stroke: var(--well); stroke-width: 2.5; stroke-linecap: round; pointer-events: none; }
+.bodymap .m.lv1, .bm-legend i.lv1 { fill: var(--burn); fill-opacity: .25; background: color-mix(in srgb, var(--burn) 25%, var(--line)); }
+.bodymap .m.lv2, .bm-legend i.lv2 { fill: var(--burn); fill-opacity: .48; background: color-mix(in srgb, var(--burn) 48%, var(--line)); }
+.bodymap .m.lv3, .bm-legend i.lv3 { fill: var(--burn); fill-opacity: .78; background: color-mix(in srgb, var(--burn) 78%, var(--line)); }
+.bodymap .m.lv4, .bm-legend i.lv4 { fill: var(--burn); fill-opacity: 1; background: var(--burn); }
+.bodymap .m.sel, .bodymap .m:focus-visible { stroke: var(--ink); stroke-width: 3.5; }
+.bm-pick { text-align: center; font-weight: 700; font-size: 0.9rem; min-height: 1.4em; }
+.bm-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 12px; font-size: 0.76rem; color: var(--muted); }
+.bm-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.bm-legend i { width: 12px; height: 12px; border-radius: 4px; background: var(--line); }
+.bm-legend .lgu { flex-basis: 100%; justify-content: center; }
+.bodymap.mini { background: var(--well); border-radius: 16px; padding: 10px 8px 6px; }
+.bodymap.mini svg { max-width: 92px; }
+.bodymap.mini .m { stroke: var(--well); cursor: default; }
+.restday { background: var(--accent-soft); gap: 8px; }
+.restday .rd-head { display: flex; justify-content: space-between; align-items: center; }
+.restday h2 { color: var(--accent); }
+.restday .rd-moon { font-size: 1.5rem; color: var(--accent); line-height: 1; }
+.restday p { font-size: 0.95rem; }
+.restday .note { font-size: 0.84rem; }
+.todo.rest::after { background: var(--accent); }
+.todo.rest .t::before { content: "☾ "; }
 @media (max-width: 440px) {
   .weekgrid { grid-template-columns: 1fr; }
   .exrow, .exhead { grid-template-columns: 1fr 1fr 36px; row-gap: 4px; }
@@ -588,6 +620,9 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
   <div class="streaks" id="streaks"></div>
   <div class="setup-hint" id="backupHint" hidden></div>
   </div>
+
+  <!-- REST DAY -->
+  <section class="panel restday off" id="restCard" data-tab="today"></section>
 
   <!-- WEEKLY CHECK-IN -->
   <section class="panel checkin" id="checkinCard" data-tab="today" hidden></section>
@@ -743,7 +778,13 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
       <details class="tpl fold"><summary><span>Records</span></summary><div class="body"><div class="pbs records" id="liftRecords"></div></div></details>
       <details class="tpl fold"><summary><span>Every session</span></summary><div class="body"><ul class="log" id="liftHistory"></ul></div></details>
     </div>
-    <details class="tpl fold" id="muscleFold"><summary><span>Sets per muscle group</span></summary><div class="body">
+    <div class="bodymap-card" id="bodyMapCard">
+      <div class="sec-head"><span class="label">Muscles worked, last 7 days</span></div>
+      <div class="bodymap" id="bodyMap"></div>
+      <p class="bm-pick" id="bodyMapPick" aria-live="polite"></p>
+      <div class="bm-legend" id="bodyMapLegend"></div>
+    </div>
+    <details class="tpl fold" id="muscleFold"><summary><span>Sets per muscle: numbers and settings</span></summary><div class="body">
     <div class="devgroup" id="muscleBox">
       <div class="sec-head"><span class="note" id="muscleNote"></span></div>
       <div id="muscleRows"></div>
@@ -1338,6 +1379,8 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
     renderProfile(tg);
     renderTodayBar(d, label);
     renderStreaks();
+    renderRestCard(d);
+    renderBodyMap();
     renderCheckin();
     renderPlanToday(d);
     renderSession();
@@ -1394,7 +1437,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
       items.push(["due", "Weigh-in", last ? `Due, last on ${shortDate(last)}` : "Due this week", "mWeight"]);
     }
     const tpl = plannedFor(state.current);
-    if (!tpl) items.push(["", "Training", state.plan.templates.length ? "Rest day" : "No plan set", tpl ? "planToday" : "planPanel"]);
+    if (!tpl) items.push(state.plan.templates.length ? ["done rest", "Rest day", "Recovery counts", "planToday"] : ["", "Training", "No plan set", "planPanel"]);
     else {
       const doneN = tpl.exercises.filter(it => itemDone(it, d)).length;
       items.push([doneN >= tpl.exercises.length && doneN ? "done" : "due", tpl.name || "Workout", `${doneN} of ${tpl.exercises.length} done`, "planToday"]);
@@ -3049,11 +3092,12 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
       b.append(top); if (extra) b.append(extra); b.append(el("span", "ss", sub));
       b.onclick = onTap; return b;
     };
-    const fSub = f.n === 0 ? "Log food today to start one" : f.todayDone ? "Logged today ✓" : "Log today to keep it going";
+    const hadOne = f.n === 0 && day(addDays(todayKey(), -2)).food.length > 0;
+    const fSub = f.n === 0 ? (hadOne ? "Fresh start: log today to begin a new one" : "Log food today to start one") : f.todayDone ? "Logged today ✓" : "Log today to keep it going";
     const ft = tile("food" + (f.n && !f.todayDone ? " risk" : "") + (f.n ? "" : " zero"), f.n, f.n === 1 ? "day logging food" : "days logging food", fSub, null, () => go("food", null, "foodName"));
     const dots = el("div", "wdots");
     for (let i = 0; i < w.tgt; i++) dots.append(el("i", i < w.now ? "on" : ""));
-    const wSub = w.now >= w.tgt ? `Week done: ${w.now} of ${w.tgt} workouts` : `${w.now} of ${w.tgt} workouts this week`;
+    const wSub = w.now >= w.tgt ? `Week done: ${w.now} of ${w.tgt} workouts` : w.n === 0 && w.now === 0 ? `New week, fresh start: ${w.tgt} planned` : `${w.now} of ${w.tgt} workouts this week`;
     const wt = tile("train" + (w.n ? "" : " zero"), w.n, w.n === 1 ? "week on target" : "weeks on target", wSub, dots, () => go("train"));
     box.append(ft, wt);
   }
@@ -3162,6 +3206,10 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
       t("Time", mins > 0 && mins < 300 ? String(mins) : "–", mins > 0 && mins < 300 ? "min" : ""); t("PRs", String(prs.length));
       b.append(tiles);
       const fun = heavyAs(vol); if (fun) b.append(el("p", "sum-fun", fun));
+      const mc = {}; for (const w of entries) { const g = muscleOf(w.name); mc[g] = (mc[g] || 0) + w.sets.length; }
+      const mm = el("div", "bodymap mini"); drawBodyMap(mm, mc, sessionLevel, "today", null);
+      const worked = MUSCLES.filter(g => mc[g] && g !== "Other");
+      if (worked.length) { b.append(mm); b.append(el("p", "note", "Worked today: " + worked.map(g => `${g} (${mc[g]})`).join(", "))); }
       const ul = el("ul", "log");
       for (const w of entries) {
         const li = el("li"), n = el("div", "name", w.name);
@@ -3176,6 +3224,92 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
       b.append(ok);
     });
     setTimeout(() => confetti($("sheetTitle")), 250);
+  }
+
+  // ---------- muscle map: a front and back figure, each muscle shaded by how many sets it got ----------
+  const MAP_LEVELS = [[0, "0"], [1, "1–4"], [5, "5–9"], [10, "10–20"], [21, "20+"]];
+  const weekLevel = n => n >= 21 ? 4 : n >= 10 ? 3 : n >= 5 ? 2 : n >= 1 ? 1 : 0;
+  const sessionLevel = n => n >= 6 ? 4 : n >= 3 ? 3 : n >= 1 ? 2 : 0;
+  function bodyFigure(view, counts, level, label) {
+    const mx = x => 200 - x;
+    const ell = (cls, g, cx, cy, rx, ry) => `<ellipse class="${cls}"${g ? ` data-g="${g}"` : ""} cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"/>`;
+    const pair = (cls, g, cx, cy, rx, ry) => ell(cls, g, cx, cy, rx, ry) + ell(cls, g, mx(cx), cy, rx, ry);
+    const m = g => `m lv${level(counts[g] || 0)}`;
+    const rot = (cx, cy, deg, inner) => `<g transform="rotate(${deg} ${cx} ${cy})">${inner}</g>`;
+    const pairR = (cls, g, cx, cy, rx, ry, deg) => rot(cx, cy, deg, ell(cls, g, cx, cy, rx, ry)) + rot(mx(cx), cy, -deg, ell(cls, g, mx(cx), cy, rx, ry));
+    let s = `<svg viewBox="0 0 200 430" role="img" aria-label="${label}">`;
+    // one continuous silhouette underneath, so the figure reads as a body rather than parts
+    const limb = (x1, y1, x2, y2, w) => `<path class="nb-s" stroke-width="${w}" d="M${x1} ${y1} L${x2} ${y2} M${mx(x1)} ${y1} L${mx(x2)} ${y2}"/>`;
+    s += `<g class="sil"><circle cx="100" cy="33" r="20"/><rect x="90" y="48" width="20" height="24" rx="8"/>`;
+    s += `<path d="M70 70 Q100 62 130 70 Q148 77 144 101 L134 150 Q128 184 124 196 L127 222 Q100 238 73 222 L76 196 Q72 184 66 150 L56 101 Q52 77 70 70 Z"/>`;
+    s += limb(61, 88, 50, 160, 24) + limb(50, 160, 43, 214, 18) + limb(87, 214, 85, 302, 36) + limb(85, 302, 85, 396, 25);
+    s += `<circle cx="42" cy="227" r="9.5"/><circle cx="158" cy="227" r="9.5"/><ellipse cx="85" cy="408" rx="14" ry="8"/><ellipse cx="115" cy="408" rx="14" ry="8"/></g>`;
+    if (view === "front") {
+      s += pair(m("Shoulders"), "Shoulders", 62, 90, 17, 16);
+      s += `<path class="${m("Chest")}" data-g="Chest" d="M98.5 76 H78 Q67 80 69 97 Q73 116 98.5 114 Z"/><path class="${m("Chest")}" data-g="Chest" d="M101.5 76 H122 Q133 80 131 97 Q127 116 101.5 114 Z"/>`;
+      s += pairR(m("Biceps"), "Biceps", 55, 128, 10, 24, 8);
+      s += `<rect class="${m("Core")}" data-g="Core" x="80" y="120" width="40" height="72" rx="14"/>`;
+      s += `<path class="sep" d="M100 125 V186 M84 141 H116 M84 162 H116"/>`;
+      s += pairR(m("Quads"), "Quads", 86, 256, 16, 42, 1.5);
+      s += pair(m("Calves"), "Calves", 85, 350, 10.5, 33);
+    } else {
+      s += `<path class="${m("Back")}" data-g="Back" d="M77 75 H123 Q132 80 130 99 L122 150 Q117 182 112 190 H88 Q83 182 78 150 L70 99 Q68 80 77 75 Z"/>`;
+      s += `<path class="sep" d="M100 80 V186 M81 113 Q100 125 119 113"/>`;
+      s += pair(m("Shoulders"), "Shoulders", 62, 90, 17, 16);
+      s += pairR(m("Triceps"), "Triceps", 55, 128, 10, 24, 8);
+      s += pair(m("Hamstrings & glutes"), "Hamstrings & glutes", 89, 211, 13.5, 15.5);
+      s += pairR(m("Hamstrings & glutes"), "Hamstrings & glutes", 86, 264, 15, 36, 1.5);
+      s += pair(m("Calves"), "Calves", 85, 346, 12, 31);
+    }
+    return s + "</svg>";
+  }
+  // draws both figures into `box`; tapping a muscle shows its count in `pick`
+  function drawBodyMap(box, counts, level, unit, pick) {
+    box.innerHTML = `<figure>${bodyFigure("front", counts, level, "Muscles, front view")}<figcaption>Front</figcaption></figure><figure>${bodyFigure("back", counts, level, "Muscles, back view")}<figcaption>Back</figcaption></figure>`;
+    if (!pick) return;
+    const show = g => {
+      for (const p of box.querySelectorAll(".m")) p.classList.toggle("sel", p.dataset.g === g);
+      const n = counts[g] || 0;
+      pick.textContent = `${g}: ${n} set${n === 1 ? "" : "s"} ${unit}`;
+    };
+    for (const p of box.querySelectorAll(".m")) { p.setAttribute("tabindex", "0"); p.setAttribute("role", "button"); p.setAttribute("aria-label", `${p.dataset.g}: ${counts[p.dataset.g] || 0} sets`); p.addEventListener("click", () => show(p.dataset.g)); p.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(p.dataset.g); } }); }
+    if (box.dataset.sel) show(box.dataset.sel);
+    box.onclick = e => { const g = e.target.closest(".m")?.dataset.g; if (g) box.dataset.sel = g; };
+  }
+  function renderBodyMap() {
+    const card = $("bodyMapCard"); if (!card) return;
+    const counts = setsByMuscle(addDays(state.current, -6), state.current);
+    const any = Object.values(counts).some(Boolean);
+    card.classList.toggle("off", !any && !exerciseNames().length);
+    drawBodyMap($("bodyMap"), counts, weekLevel, "in the last 7 days", $("bodyMapPick"));
+    if (!$("bodyMap").dataset.sel) $("bodyMapPick").textContent = any ? "Tap a muscle to see its sets" : "No weights logged in the last 7 days";
+    const lg = $("bodyMapLegend"); lg.replaceChildren();
+    for (const [n, t] of MAP_LEVELS) { const i = el("span"); i.append(el("i", "lv" + weekLevel(n)), document.createTextNode(t)); lg.append(i); }
+    lg.append(el("span", "lgu", "sets in 7 days · 10–20 is a common target for growth"));
+  }
+
+  // ---------- rest days: recovery counts ----------
+  const REST_LINES = [
+    "Muscles grow while you rest, not while you lift. Today's job: eat your protein and sleep well.",
+    "Recovery is part of the plan. A walk or some stretching is plenty.",
+    "Your next session will feel better for it. Hit your protein and get to bed on time.",
+    "Rest days keep your weekly streak going. Nothing to make up for.",
+    "Sore or not, rest is training too. Easy movement and good food today."
+  ];
+  function renderRestCard(d) {
+    const card = $("restCard");
+    const isRest = state.current === todayKey() && state.plan.templates.length && !plannedFor(state.current) && !d.workouts.length;
+    card.classList.toggle("off", !isRest);
+    if (!isRest) return;
+    card.replaceChildren();
+    const line = REST_LINES[dayNum(state.current) % REST_LINES.length];
+    const tg = targets(), p = sum(d.food, "protein");
+    const head = el("div", "rd-head"); head.append(el("h2", null, "Rest day"), el("span", "rd-moon", "☾"));
+    card.append(head, el("p", null, line));
+    if (tg.protein) card.append(el("p", "note", `Protein so far: ${dec(p)} of ${tg.protein} g${p >= tg.protein ? " ✓" : ""}`));
+    const w = trainStreak();
+    let next = null; for (let i = 1; i <= 7; i++) { const k = addDays(state.current, i), t = plannedFor(k); if (t) { next = [k, t]; break; } }
+    if (next) card.append(el("p", "note", `Next up: ${next[1].name || "Workout"} on ${fromKey(next[0]).toLocaleDateString("en-MY", { weekday: "long" })}.${w.n ? ` Weekly streak: ${w.n} week${w.n === 1 ? "" : "s"}.` : ""}`));
   }
 
   // ---------- changes ----------
@@ -3512,7 +3646,7 @@ pre.report { margin: 0; max-height: 60vh; overflow: auto; background: var(--well
   };
 
   // ---------- developer info ----------
-  const APP_VERSION = "18", APP_BUILD = "30 Oct 2026";
+  const APP_VERSION = "19", APP_BUILD = "30 Oct 2026";
   const fmtTime = t => t ? new Date(t).toLocaleString("en-MY", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", second: "2-digit" }) : "never";
   const ago = t => { if (!t) return "never"; const s = Math.round((Date.now() - t) / 1000); return s < 60 ? `${s}s ago` : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} days ago`; };
   let devExtra = [];

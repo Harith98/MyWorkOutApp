@@ -1,7 +1,7 @@
 // Fuel Log offline support: keeps the app on the phone so it opens without internet.
 // The app page itself is fetched fresh whenever there's a connection (so updates show right away);
 // the saved copy is used only when offline.
-const CACHE = "fuel-log-v15";
+const CACHE = "fuel-log-v16";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
